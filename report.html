@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report a Person - HOME</title>
+    <link rel="stylesheet" href="reportstyles.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC04f54ny3CkXEXEPRcz8bXgVk4-9Em4EA&libraries=places"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-storage.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Report a Person in Need</h2>
+        <form id="reportForm">
+            <label for="name">Name (if known):</label>
+            <input type="text" id="name" name="name" placeholder="Enter name (if known)">
+
+            <label for="age">Age:</label>
+            <input type="number" id="age" name="age" placeholder="Enter age">
+
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" name="location" placeholder="Search or select on the map">
+            <button type="button" onclick="getCurrentLocation()">📍 Use My Location</button>
+
+            <div id="map"></div>
+
+            
+            <label for="district">District:</label>
+            <input type="text" id="district" name="district" placeholder="Enter district">
+            <label for="medical">Immediate Medical Assistance Required?</label>
+            <select id="medical" name="medical">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select>
+
+            <label for="condition">Physical & Mental Condition:</label>
+            <textarea id="condition" name="condition" rows="4" placeholder="Describe condition"></textarea>
+
+            <label for="comments">Additional Comments:</label>
+            <textarea id="comments" name="comments" rows="3" placeholder="Any additional details"></textarea>
+
+            <button type="submit">Submit Report</button>
+        </form>
+    </div>
+
+    <script src="reportscripts.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-storage.js";
+    
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNzH9Ybtb4TUbUgHBI9Uv3f_o2S8ioaco",
+            authDomain: "home-ff487.firebaseapp.com",
+            projectId: "home-ff487",
+            storageBucket: "home-ff487.appspot.com",
+            messagingSenderId: "1042502575422",
+            appId: "1:1042502575422:web:5fe53e404e3d5c0dd8f86f",
+            measurementId: "G-WS7CHSE4NV"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+    
+        const form = document.getElementById("reportForm");
+    
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+    
+            const name = document.getElementById("name").value;
+            const age = document.getElementById("age").value;
+            const gender = document.getElementById("gender").value;
+            const district = document.getElementById("district").value;
+            const location = document.getElementById("location").value;
+            const medical = document.getElementById("medical").value;
+            const condition = document.getElementById("condition").value;
+            const comments = document.getElementById("comments").value;
+           
+    
+            console.log("Form Data:", { name, age, gender,district, location, medical, condition, comments });
+    
+            try {
+                
+    
+                // Save report to Firestore
+                await addDoc(collection(db, "report"), {
+                    name,
+                    age,
+                    gender,
+                    district,
+                    location,
+                    medical,
+                    condition,
+                    comments,
+                    timestamp: serverTimestamp(),
+                    status: "Pending"
+                });
+    
+                console.log("Report submitted successfully!");
+                alert("Report submitted successfully!");
+                form.reset();
+                window.location.href = "homepage.html";
+            } catch (error) {
+                console.error("Error submitting report: ", error);
+                alert("Failed to submit the report. Please try again.");
+            }
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>

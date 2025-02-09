@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Login - HAN</title>
+    <link rel="stylesheet" href="voluntlogin.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- FontAwesome for Icons -->
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="logo">
+                <i class="fas fa-user-circle"></i> <!-- User Icon -->
+            </div>
+            <h2>Welcome Back!</h2>
+            <p class="subtitle">Log in to continue as a Volunteer.</p>
+
+            <form id="login-form">
+                <div class="input-container">
+                    <i class="fas fa-user"></i> <!-- Name Icon -->
+                    <input type="text" id="name" placeholder="Enter Your Name" required>
+                </div>
+                <div class="input-container">
+                    <i class="fas fa-lock"></i> <!-- Password Icon -->
+                    <input type="password" id="password" placeholder="Enter Your Password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+
+            <p id="message"></p>
+            <p class="footer-text">New here? <a href="voluntsignup.html">Create an Account</a></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Legacy CDN for Non-Module Environments) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Your Custom Script -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNzH9Ybtb4TUbUgHBI9Uv3f_o2S8ioaco",
+            authDomain: "home-ff487.firebaseapp.com",
+            projectId: "home-ff487",
+            storageBucket: "home-ff487.appspot.com",
+            messagingSenderId: "1042502575422",
+            appId: "1:1042502575422:web:5fe53e404e3d5c0dd8f86f",
+            measurementId: "G-WS7CHSE4NV"
+        };
+
+        // Initialize Firebase (compatibility mode)
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Handle Login Form Submission
+        document.getElementById("login-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById("name").value;
+            const password = document.getElementById("password").value;
+            const messageElement = document.getElementById("message");
+
+            try {
+                // Fetch Data from Firestore
+                const querySnapshot = await db.collection("volunteers")
+                    .where("name", "==", name)
+                    .where("password", "==", password)
+                    .get();
+
+                if (!querySnapshot.empty) {
+                    // User found, login successful
+                    messageElement.style.color = "green";
+                    messageElement.innerText = "Login successful! Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "voluntdash.html"; // Redirect to dashboard or another page
+                    }, 2000);
+                } else {
+                    // No matching user found
+                    messageElement.style.color = "red";
+                    messageElement.innerText = "Invalid name or password.";
+                }
+            } catch (error) {
+                console.error("Firestore Error:", error);
+                messageElement.style.color = "red";
+                messageElement.innerText = "Error: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

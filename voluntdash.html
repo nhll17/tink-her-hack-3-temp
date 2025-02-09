@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Dashboard</title>
+
+    <!-- ✅ Load Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC04f54ny3CkXEXEPRcz8bXgVk4-9Em4EA&libraries=places"></script>
+
+    <!-- ✅ Load Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <link rel="stylesheet" href="voluntdash.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section with Logout Button -->
+        <header>
+            <h2>Volunteer Dashboard</h2>
+            <button onclick="logout()" class="logout-button">Logout</button>
+        </header>
+
+        <!-- 📂 Pending Cases Section -->
+        <div class="cases-container">
+            <h3>Pending Cases</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Med Needs</th>
+                        <th>Type of Help</th>
+                        <th>Status</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingCases"></tbody>
+            </table>
+        </div>
+
+        <!-- ✅ Accepted Cases Section -->
+        <div class="cases-container">
+            <h3>Accepted Cases</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Location</th>
+                        <th>Accepted By</th>
+                        <th>Contact</th>
+                        <th>Finished</th>
+                    </tr>
+                </thead>
+                <tbody id="acceptedCases"></tbody>
+            </table>
+        </div>
+
+        <!-- 🗺️ Google Map for Tracking -->
+        <div id="map"></div>
+
+        <!-- 📝 Notes & Comments Section -->
+        <div class="notes-container">
+            <h3>Add Notes</h3>
+            <textarea id="volunteerNotes" placeholder="Enter notes..."></textarea>
+            <button onclick="saveNotes()">Save Notes</button>
+        </div>
+
+        <!-- 🚨 Emergency Assistance -->
+        <div class="emergency-container">
+            <!-- Add content here if needed -->
+        </div>
+    </div>
+
+    <script>
+        // ✅ Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC04f54ny3CkXEXEPRcz8bXgVk4-9Em4EA",
+            authDomain: "home-ff487.firebaseapp.com",
+            projectId: "home-ff487",
+            storageBucket: "home-ff487.appspot.com",
+            messagingSenderId: "1042502575422",
+            appId: "1:1042502575422:web:5fe53e404e3d5c0dd8f86f",
+            measurementId: "G-WS7CHSE4NV"
+        };
+
+        // ✅ Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        let map;
+        let markers = [];
+
+        // ✅ Initialize Google Map
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 28.6139, lng: 77.2090 }, // Default to New Delhi, India
+                zoom: 5,
+            });
+        }
+
+        // ✅ Fetch Pending Cases
+        async function fetchPendingCases() {
+            const pendingCases = document.getElementById("pendingCases");
+            pendingCases.innerHTML = "";  // Clear previous data
+
+            const querySnapshot = await db.collection("report")
+                .where("status", "==", "Pending")
+                .get();
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${data.name || "Unknown"}</td>
+                    <td>${data.age || "N/A"}</td>
+                    <td>${data.gender || "N/A"}</td>
+                    <td>${data.medical || "N/A"}</td>
+                    <td>${data.typeOfHelp || "General Assistance"}</td>
+                    <td>${data.status}</td>
+                   
+                    <td><button onclick="showLocation('${data.location}')">📍 View Location</button></td>
+                `;
+
+                pendingCases.appendChild(row);
+                if (data.location) addMarkerToMap(data.location, data.name, data.medical);
+            });
+        }
+
+        // ✅ Fetch Accepted Cases
+        async function fetchAcceptedCases() {
+            const acceptedCases = document.getElementById("acceptedCases");
+            acceptedCases.innerHTML = "";  // Clear previous data
+
+            const querySnapshot = await db.collection("report")
+                .where("status", "==", "Accepted")
+                .get();
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${data.name || "Unknown"}</td>
+                    <td>${data.age || "N/A"}</td>
+                    <td>${data.gender || "N/A"}</td>
+                    <td><button onclick="showLocation('${data.location}')">📍 View Location</button></td>
+                    <td>${data.acceptedBy || "Unknown Organization"}</td>
+                    <td>${data.organizationPhone || "No Contact"}</td>
+                    <td><input type="checkbox" onchange="removeCase('${doc.id}', this.checked)"></td>
+                `;
+
+                acceptedCases.appendChild(row);
+                if (data.location) addMarkerToMap(data.location, data.name);
+            });
+        }
+
+        // ✅ Update Case Status
+        async function updateStatus(reportId, status) {
+            try {
+                await db.collection("report").doc(reportId).update({ status });
+                alert(`Case status updated to ${status}`);
+                fetchPendingCases(); // Refresh pending cases
+                fetchAcceptedCases(); // Refresh accepted cases
+            } catch (error) {
+                console.error("Error updating status:", error);
+            }
+        }
+
+        // ✅ Add Markers to Map
+        function addMarkerToMap(location, name, needs) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: location }, function (results, status) {
+                if (status === "OK") {
+                    const marker = new google.maps.Marker({
+                        position: results[0].geometry.location,
+                        map: map,
+                        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<strong>${name}</strong><br>Needs: ${needs}`
+                    });
+
+                    marker.addListener("click", () => {
+                        infoWindow.open(map, marker);
+                    });
+
+                    markers.push(marker);
+                } else {
+                    console.error("Geocode was not successful: " + status);
+                }
+            });
+        }
+
+        // ✅ Show Location on Map when Clicked
+        function showLocation(location) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: location }, function (results, status) {
+                if (status === "OK") {
+                    map.setCenter(results[0].geometry.location);
+                    map.setZoom(12);
+                } else {
+                    alert("Location not found!");
+                }
+            });
+        }
+
+        // ✅ Remove Case when Checkbox is Ticked
+        async function removeCase(reportId, isChecked) {
+            if (isChecked) {
+                try {
+                    await db.collection("report").doc(reportId).delete();
+                    alert("Case finished successfully");
+                    fetchAcceptedCases(); // Refresh accepted cases
+                } catch (error) {
+                    console.error("Error removing case:", error);
+                }
+            }
+        }
+
+        // ✅ Logout Function
+        function logout() {
+            // Clear any stored session data if applicable
+            localStorage.clear();
+            // Redirect to home page
+            window.location.href = "homepage.html";
+        }
+
+        // ✅ Load Data on Page Load
+        window.onload = function () {
+            initMap();
+            fetchPendingCases();
+            fetchAcceptedCases();
+        };
+    </script>
+</body>
+</html>

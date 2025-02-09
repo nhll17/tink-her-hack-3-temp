@@ -1,0 +1,166 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Body Styling */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f3e8fc; /* Light purple background */
+    background-image: url('https://www.transparenttextures.com/patterns/binding-dark.png'); /* Subtle pattern */
+    margin: 0;
+}
+
+/* Container Styling */
+.container {
+    display: flex;
+    width: 900px;
+    max-width: 100%;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Left Section */
+.container form {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+
+.container h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #6a1b9a;
+    font-weight: bold;
+    text-align: center;
+}
+
+.container .tagline {
+    font-size: 0.9rem;
+    color: #8e44ad;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form input, form select, form button {
+    width: 100%;
+    padding: 12px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+form input::placeholder, form select {
+    color: #aaa;
+}
+
+form input, form select {
+    background: #f9f6fc;
+    color: #6a1b9a;
+}
+
+form button {
+    background: #8e44ad;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+    font-weight: bold;
+}
+
+form button:hover {
+    background: #6a1b9a;
+}
+
+form p {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #6a1b9a;
+}
+
+form a {
+    color: #8e44ad;
+    text-decoration: none;
+}
+
+form a:hover {
+    text-decoration: underline;
+}
+
+/* Right Section */
+.container .right-section {
+    flex: 1;
+    background: linear-gradient(135deg, #d3bce8, #c9a6e1); /* Soft purple gradient */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    color: white;
+    text-align: center;
+    position: relative;
+    position: relative;
+}
+
+.container .right-section::before {
+    content: '';
+    background-image: url('https://www.transparenttextures.com/patterns/dotted-pattern.png'); /* Subtle crossline pattern */
+    background-size: cover;
+    background-repeat: repeat;
+    opacity: 0.3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.container .right-section h3,
+.container .right-section h2 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+
+.container .right-section h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.container .right-section h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.container .right-section p {
+    position: relative;
+    font-size: 1rem;
+    z-index: 1;
+    margin-top: 20px;
+    line-height: 1.5;
+    max-width: 80%;
+}
+
+/* Flexbox Adjustments for Center Alignment */
+.container .right-section > * {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}

@@ -1,0 +1,158 @@
+/* Import Elegant Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:wght@500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to right, #E4D7FF, #F0E8FF);
+    color: #3A2B5C;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px;
+    position: relative;
+}
+
+/* ✨ Soft Background Glow */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(106, 78, 153, 0.3) 20%, transparent 60%);
+    filter: blur(90px);
+    z-index: -1;
+}
+
+/* Elegant Form Container */
+.form-container {
+    width: 90%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(14px);
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0px 0px 30px rgba(106, 78, 153, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: all 0.3s ease-in-out;
+}
+
+/* ✨ Elegant Form Heading */
+h2 {
+    text-align: center;
+    font-size: 32px;
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    color: #6A4E99;
+    text-shadow: 0px 0px 10px rgba(106, 78, 153, 0.4);
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Form Styling */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Label Styling */
+label {
+    font-weight: 600;
+    color: #3A2B5C;
+    font-size: 16px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Input Fields */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid rgba(106, 78, 153, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: 0.3s ease-in-out;
+    outline: none;
+}
+
+/* Focus Effect for Inputs */
+input:focus, select:focus, textarea:focus {
+    border: 2px solid #6A4E99;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0px 0px 15px rgba(106, 78, 153, 0.4);
+}
+
+/* File Upload */
+input[type="file"] {
+    background: none;
+    border: none;
+}
+
+/* ✨ Map Container */
+.map-container {
+    margin-top: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(106, 78, 153, 0.3);
+    box-shadow: 0px 4px 15px rgba(106, 78, 153, 0.3);
+    transition: 0.3s ease-in-out;
+}
+
+.map-container:hover {
+    box-shadow: 0px 4px 20px rgba(106, 78, 153, 0.5);
+}
+
+/* Map */
+#map {
+    width: 100%;
+    height: 300px;
+    border-radius: 12px;
+}
+
+/* Button Styling */
+button {
+    background: linear-gradient(135deg, #6A4E99, #D2B6FF);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    width: 100%;
+    margin-top: 10px;
+    box-shadow: 0px 0px 15px rgba(106, 78, 153, 0.4);
+}
+
+/* Button Hover Effect */
+button:hover {
+    box-shadow: 0px 0px 25px rgba(106, 78, 153, 0.8);
+    transform: scale(1.05) translateY(-2px);
+    background: linear-gradient(135deg, #D2B6FF, #6A4E99);
+}
+
+/* ✨ Fade In Effect */
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(-12px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        width: 95%;
+    }
+}
+

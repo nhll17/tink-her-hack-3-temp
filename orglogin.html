@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Login - HAN</title>
+    <link rel="stylesheet" href="orglogin.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- FontAwesome for Icons -->
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="logo">
+                <i class="fas fa-building"></i> <!-- Organization Icon -->
+            </div>
+            <h2>Welcome Back, Organization!</h2>
+            <p class="subtitle">Log in to manage your resources and assist those in need.</p>
+
+            <form id="org-login-form">
+                <div class="input-container">
+                    <i class="fas fa-envelope"></i> <!-- Email Icon -->
+                    <input type="email" id="email" placeholder="Enter Your Email" required>
+                </div>
+                <div class="input-container">
+                    <i class="fas fa-lock"></i> <!-- Password Icon -->
+                    <input type="password" id="password" placeholder="Enter Your Password" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+
+            <p id="message"></p>
+            <p class="footer-text">Not registered? <a href="orgsignup.html">Create an Account</a></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Legacy CDN for Non-Module Environments) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Your Custom Script -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNzH9Ybtb4TUbUgHBI9Uv3f_o2S8ioaco",
+            authDomain: "home-ff487.firebaseapp.com",
+            projectId: "home-ff487",
+            storageBucket: "home-ff487.appspot.com",
+            messagingSenderId: "1042502575422",
+            appId: "1:1042502575422:web:5fe53e404e3d5c0dd8f86f",
+            measurementId: "G-WS7CHSE4NV"
+        };
+
+        // Initialize Firebase (compatibility mode)
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Handle Login Form Submission
+        document.getElementById("org-login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const messageElement = document.getElementById("message");
+
+        try {
+            // ✅ Query Firestore for Organization by Email
+            const querySnapshot = await db.collection("organizations").where("email", "==", email).get();
+
+            if (!querySnapshot.empty) {
+                let orgData;
+                let docId;
+
+                // 🔹 Loop through documents (only 1 expected)
+                querySnapshot.forEach(doc => {
+                    orgData = doc.data();
+                    docId = doc.id;  // Store Firestore Document ID
+                });
+
+                // ✅ Validate Password Manually (Since No Firebase Auth)
+                if (orgData.password === password) {
+                    // ✅ Store Organization Details in localStorage
+                    localStorage.setItem("orgID", docId);  // Firestore Document ID
+                    localStorage.setItem("orgEmail", orgData.email);
+                    localStorage.setItem("orgName", orgData.organizationName);
+                    localStorage.setItem("orgPhone", orgData.phone);
+                    localStorage.setItem("orgDistrict", orgData.district);
+
+                    messageElement.style.color = "green";
+                    messageElement.innerText = "Login successful! Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "orgdash.html";
+                    }, 2000);
+                } else {
+                    messageElement.style.color = "red";
+                    messageElement.innerText = "Invalid password!";
+                }
+            } else {
+                messageElement.style.color = "red";
+                messageElement.innerText = "Organization not found!";
+            }
+        } catch (error) {
+            console.error("Login Error:", error);
+            messageElement.style.color = "red";
+            messageElement.innerText = "Error: " + error.message;
+        }
+    });
+    </script>
+</body>
+</html>
